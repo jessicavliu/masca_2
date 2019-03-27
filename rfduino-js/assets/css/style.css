@@ -1,0 +1,130 @@
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+#yo {
+    position: absolute;
+    width: calc(600px * .5);
+    height: calc(930px * .5);
+}
+
+#lab {
+    position: absolute;
+    height: 80%;
+    left: 50%;
+    margin-left: calc(-932px/2);
+}
+
+.line-eye1 {
+  fill: none;
+  stroke: rgba(11, 172, 35, 1);
+  stroke-width: 1.5px;
+}
+
+.line-eye2 {
+  fill: none;
+  stroke: rgba(0, 0, 255, 1);
+  stroke-width: 1.5px;
+}
+
+.line-eye-hist {
+  fill: none;
+  stroke: rgba(11, 172, 255, 1);
+  stroke-width: 1.5px;
+}
+
+#channels {
+  width: 200px;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: rgba(0, 0, 0, .1);
+}
+
+.channel {
+  width: 200px;
+  height: 200px;
+  text-align: center;
+  background: rgba(0, 0, 0, .1);
+}
+
+.channel-name {
+  padding-top: 30px;
+  font-weight: 700;
+}
+
+.channel-value {
+  padding-top: 20px;
+  font-weight: 300;
+}
+
+#channel-eye1 {
+  background: rgba(11, 172, 35, 0.1);
+}
+
+#channel-eye2 {
+  background: rgba(0, 0, 255, 0.1);
+}
+
+#title {
+  font-size: 60px;
+  margin: 20px 0px 20px 20px;
+  font-weight: 100;
+}
+
+#plot {
+  width: calc(100% - 200px);
+  height: 800px;
+}
+
+#plot-hist {
+  width: calc(100% - 200px);
+  height: 300px;
+}
+
+#zzz {
+  height: 50px;
+  position: absolute;
+  top: 10px;
+  left: 265px;
+  /*transform: scale(-1, 1);
+  -webkit-transform: scale(-1, 1);
+  -moz-transform: scale(-1, 1);*/
+}
+
+#user {
+  position: absolute;
+  top: 10px;
+  left: 350px;
+}
+.user-elem {
+  float: left;
+  margin-right: 20px;
+  margin-bottom: 10px;
+}
+
+.user-elem:nth-child(4n) {
+  clear: left;
+}
+
+input {
+  width: 100px;
+}
+
+select {
+  width: 107px;
+}
+
+#submit {
+  margin-top: 20px;
+}
+
+#recording {
+  height: 30px;
+  width: 30px;
+  border-radius: 15px;
+  background: rgba(0,0,0,0.1);
+  float: right;
+  margin: 10px 0px 0px 20px;
+}
