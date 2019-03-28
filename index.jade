@@ -1,0 +1,52 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset='utf-8')
+    title openSleep
+    script(src='/socket.io/socket.io.js')
+    script(src='http://code.jquery.com/jquery-1.10.1.min.js')
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    script(src='/js/multithread.js')
+    script(src='/js/d3.v4.min.js')
+    script(src='/js/script.js')
+ body
+    #title openSleep
+    img(src="img/zzz.svg" id="zzz")
+    #user
+      #user-first-name.user-elem
+        .user-label User Name 
+        input(type="text", name="first_name" id="user-name")
+      #user-last-name.user-elem
+        .user-label Group Name 
+        input(type="text", name="last_name" id="group-name")
+      #user-age.user-elem
+        .user-label Age 
+        input(type="text", name="age" id="age")
+      #user-gender.user-elem
+        .user-label Gender
+        select#gender
+          option(value="undefined") Undefined
+          option(value="male") Male
+          option(value="female") Female
+      #user-buttons.user-elem
+        input(type="submit" value="Start recording" id="submit")
+        #recording
+        input(type="submit" value="Reset" id="reset")
+    #channels
+      #channel-eye1.channel
+        .channel-name Eye 1
+        #eye1.channel-value 0
+        //#eye1-counter.channel-value 0
+        //#eye1-counter-per-min.channel-value 0
+      #channel-eye2.channel
+        .channel-name Eye 2
+        #eye2.channel-value 0
+      #channel-pitch.channel
+        .channel-name Pitch
+        #pitch.channel-value 
+      #channel-roll.channel
+        .channel-name Roll
+        #roll.channel-value 0
+    svg(width="1200" height="500" id="plot") 
+    svg(width="1200" height="200" id="plot-hist") 

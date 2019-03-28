@@ -95,9 +95,9 @@ var bufferRight = [],
 		lastMov = new Date().getTime()/1000,
 		eyeMovCounter = 0,
 		minuteTime = new Date().getTime()/1000,
-		minuteCounter = 0;
+		minuteCounter = 0,
 		
-let state = 0, //  0 - Wake , 1 - NREM , 2 - REM
+var state = 0, //  0 - Wake , 1 - NREM , 2 - REM
 		bodyMinutes = 0, 
 		eyeMinutes = 0,
 		nullMinutes = 0,
@@ -106,13 +106,13 @@ let state = 0, //  0 - Wake , 1 - NREM , 2 - REM
 		eyeBaseline = 0,
 		pitchThreshold = 1000,
 		rollThreshold = 1000,
-		eyeThreshold = 5,
-		milliTime = 0,
-		sendTime = 0;
+		eyeThreshold = 5 ;
+		milliTime = 0 ;
+		sendTime = 0 ;
 
 const WAKE = 0,
-		NREM = 1,
-		REM = 2;
+			NREM = 1,
+			REM = 2;
 
 function processData(eye1, eye2) {
 	// eye1 = left
@@ -193,15 +193,15 @@ function checkMovements(){
 }
 
 function updateState(){
-	switch(state){
+	 switch(state){
 		case WAKE: if(nullMinutes >= 5) state = NREM ;
-			break;
+							 break;
 		case NREM: if(eyeMinutes >= 3) state = REM ;
-			if(bodyMinutes >= 3) state = WAKE ;
-			break;
+							 if(bodyMinutes >= 3) state = WAKE ;
+							 break;
 		case REM: if(bodyMinutes >= 3) state = WAKE ;
-			if(nullMinutes >= 5) state = NREM ;
-			break;
+							if(nullMinutes >= 5) state = NREM ;
+							 break;
 	 }
 }
 
@@ -219,7 +219,7 @@ function sendData(data) {
 		console.log(eye2)
 		console.log("state: " + state)
 		sock.emit('eyeMovMinCounter',minuteCounter);
-
+		/*
 		//update and emit state
 		checkMovements();
 		updateState();
@@ -228,7 +228,7 @@ function sendData(data) {
 			if (stream != null){
 				logData('state', state);
 			}
-		}
+		}*/
 
 		processData(eye1, eye2);
 		if (stream != null) {
