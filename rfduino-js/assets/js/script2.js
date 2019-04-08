@@ -1,10 +1,11 @@
-var socket = io.connect('http://localhost:3000');
+var socket = io.connect('http://localhost:3000', function(){console.log("client connected")});
+console.log("connected to server!")
 var eye1 = 0,
-		thresh = 50,
-		eye2 = 0;
-		pitch = 0 ;
-		roll = 0 ;
-var state = -1;
+	thresh = 50,
+	eye2 = 0;
+	pitch = 0 ;
+	roll = 0 ;
+var state = 0;
 var prev = new Date().getTime()/1000;
 var now = new Date().getTime()/1000;
 var lastBeat = new Date().getTime()/1000;
@@ -34,12 +35,15 @@ function mapStateToColor(state){
 	 }
 }
 
+socket.on('try', function (data) {
+	$('#eye1-counter-per-min').text(data);
+});
+
 socket.on('eyeMovMinCounter', function (data) {
 	$('#eye1-counter-per-min').text(data);
 });
 
 socket.on('eyeMovCounter', function (data) {
-	console.log('boom');
 	$('#eye1-counter').text(data);
 });
 
@@ -50,6 +54,11 @@ socket.on('pitch',function(data){
 socket.on('roll',function(data){
 	$("#roll").text(data);
 });
+
+socket.on('state', function(data){
+	state = state;
+	$("#state").text(data);
+})
 
 socket.on('data', function (data) {
 		newData = new Uint32Array(data);
@@ -80,6 +89,14 @@ socket.on('data', function (data) {
 		//    prev = now;
 		//  }
 		//}
+});
+
+socket.on('fakeData', function(data){
+	//console.log("in fakeData")
+	eye1 = data[0];
+	eye2 = data[1];
+	$('#eye1').text(eye1);
+	$('#eye2').text(eye2);
 });
 
 function processBPM(buffer, thresh) {
@@ -139,7 +156,10 @@ document.addEventListener("DOMContentLoaded", function(){
 			//....
 	var n = 1000,
 			nHist = 1,
-			dataEye1 = d3.range(n).map(() => {return 0;});
+			//dataEye1 = d3.range(n).map(() => {return {'eye1': 0, 'state': 0};});
+			dataEye1 = d3.range(n).map(() => {return 0;})
+			//console.log("dataEye1");
+			//console.log(dataEye1);
 			dataEye2 = d3.range(n).map(() => {return 0;});
 			dataEyeHist = d3.range(n).map(() => {return 0;});
 	var svg = d3.select("#plot"),
@@ -180,7 +200,19 @@ document.addEventListener("DOMContentLoaded", function(){
 
 	var lineEye1 = d3.line()
 		.x(function(d, i) { return x(i); })
-		.y(function(d, i) { return y(d); });
+		.y(function(d, i) {
+		 /*if (i % 200 == 0){
+		 	if(typeof(d) == 'object'){
+		 		//console.log(d['eye1'])
+		 		//return y(d['eye1'])
+		 	}
+		 	else{
+		 		console.log(d)
+		 		return y(d);
+		 	}
+		 }
+		 return y(d['eye1']); */
+		 return y(d);});
 	var lineEye2 = d3.line()
 		.x(function(d, i) { return x(i); })
 		.y(function(d, i) { return y(d); });
@@ -207,10 +239,14 @@ document.addEventListener("DOMContentLoaded", function(){
 	g.append("g")
 		.attr("clip-path", "url(#clip)")
 	.append("path")
+		//dataEye1 is the data we want to test
 		.datum(dataEye1)
+		//.attr('stroke', '')
+		//.attr('fill', 'none')
 		.attr("class", "line-eye1")
-		.attr("stroke", mapStateToColor(state))
-		.style("fill", mapStateToColor(state))
+
+		//,mapStateToColor(state))
+		//.style("fill", "blue")//mapStateToColor(state))
 	.transition()
 		.duration(delay)
 		.ease(d3.easeLinear)
@@ -221,6 +257,7 @@ document.addEventListener("DOMContentLoaded", function(){
 	.append("path")
 		.datum(dataEye2)
 		.attr("class", "line-eye2")
+		.attr('stroke', 'purple')
 	.transition()
 		.duration(delay)
 		.ease(d3.easeLinear)
@@ -255,6 +292,9 @@ document.addEventListener("DOMContentLoaded", function(){
 	
 	function tick() {
 		// Push a new data point onto the back.
+		//console.log(eye1);
+		//console.log(eye2);
+		//var elem = {'eye1':eye1, 'state':state}
 		dataEye1.push(eye1);
 		dataEye2.push(eye2);
 		// Redraw the line.
@@ -270,6 +310,7 @@ document.addEventListener("DOMContentLoaded", function(){
 		// Pop the old data point off the front.
 		dataEye1.shift();
 		dataEye2.shift();
+		//console.log(dataEye1);
 	}
  
 	function updateScale() {

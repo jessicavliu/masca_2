@@ -28,7 +28,7 @@ app.get('/', function(req, res){
 	res.render('index');
 });
 
-var server = app.listen(3000);
+var server = app.listen(3000, function(){console.log("app listening at port 3000")});
 var io = require('socket.io').listen(server);
 var sock = null;
 var fs = require('fs');
@@ -45,13 +45,18 @@ function logData(variable, value) {
 }
 
 io.sockets.on('connection', function (socket) {
+	console.log("connection")
+	socket.emit('try', 222)
 	sock = socket;
+
+	setInterval(sendFakeData, 50);
+
 	sock.on('user', function (data) {
 		if (data.recording == 'start') {
 			fileName = './logs/' + String(data.userName) + '_' + String(data.groupName);
-			console.log(fileName);
+			//console.log(fileName);
 			if (fs.existsSync(fileName)) {
-				console.log('already exists');
+				//console.log('already exists');
 				return;
 			}
 			stream = fs.createWriteStream(fileName);
@@ -69,7 +74,7 @@ io.sockets.on('connection', function (socket) {
 		}
 	});
 	sock.on('eyeMovReset', function(data) {
-		console.log('rest');
+		//console.log('rest');
 		eyeMovCounter = 0;
 		sock.emit('eyeMovCounter', eyeMovCounter);
 		minuteCounter = 0;
@@ -97,7 +102,7 @@ var bufferRight = [],
 		minuteTime = new Date().getTime()/1000,
 		minuteCounter = 0;
 		
-let state = 0, //  0 - Wake , 1 - NREM , 2 - REM
+var state = 0, //  0 - Wake , 1 - NREM , 2 - REM
 		bodyMinutes = 0, 
 		eyeMinutes = 0,
 		nullMinutes = 0,
@@ -106,13 +111,13 @@ let state = 0, //  0 - Wake , 1 - NREM , 2 - REM
 		eyeBaseline = 0,
 		pitchThreshold = 1000,
 		rollThreshold = 1000,
-		eyeThreshold = 5,
-		milliTime = 0,
-		sendTime = 0;
+		eyeThreshold = 5 ;
+		milliTime = 0 ;
+		sendTime = 0 ;
 
 const WAKE = 0,
-		NREM = 1,
-		REM = 2;
+			NREM = 1,
+			REM = 2;
 
 function processData(eye1, eye2) {
 	// eye1 = left
@@ -122,13 +127,15 @@ function processData(eye1, eye2) {
 			initRight = true;
 		}
 	} else {
+		console.log("in else branch");
 		bufferRight.shift();
 		meanRight = average(bufferRight);
 		now = new Date().getTime()/1000;
 		diff = bufferRight[1] - eye2
-		//console.log("diff: " + String(diff));
+		console.log("diff: " + String(diff));
 
 		//emit eye movement
+		console.log("publishEyeMovement")
 		publishEyeMovement(diff, now);
 
 		//if a minute has passed, emit eyeMovementPerMin and reset the per-min counter
@@ -138,20 +145,22 @@ function processData(eye1, eye2) {
 }
 
 function publishEyeMovement(diff, now){
-	if (diff > threshRightBot &&
+	//the only reason this is commented out is because i'm trying to use fake data
+	/*if (diff > threshRightBot &&
 		diff < threshRightTop &&
-		now - lastMov > refracPeriod) {
+		now - lastMov > refracPeriod) {*/
 		lastMov = new Date().getTime()/1000;
-		console.log("MOVEMENT");
+		//console.log("MOVEMENT");
 		eyeMovCounter++;
 		minuteCounter++;  
 		if (sock != null) {
 			sock.emit('eyeMovCounter', eyeMovCounter);
+			console.log('emitted eyeMovCounter')
 			if (stream != null) {
 				logData('eye movement', 1);
 			}
 		}
-	}
+	//}
 }
 
 function publishEyeMovementPerMin(now){
@@ -193,33 +202,61 @@ function checkMovements(){
 }
 
 function updateState(){
-	switch(state){
+	 switch(state){
 		case WAKE: if(nullMinutes >= 5) state = NREM ;
-			break;
+							 break;
 		case NREM: if(eyeMinutes >= 3) state = REM ;
-			if(bodyMinutes >= 3) state = WAKE ;
-			break;
+							 if(bodyMinutes >= 3) state = WAKE ;
+							 break;
 		case REM: if(bodyMinutes >= 3) state = WAKE ;
-			if(nullMinutes >= 5) state = NREM ;
-			break;
+							if(nullMinutes >= 5) state = NREM ;
+							 break;
 	 }
 }
 
 var oldEye1 = 0;
+
 var oldEye2 = 0;
+function sendFakeData(){
+	var count = 0;
+	if(count % 3000 == 0){
+		console.log('state changing')
+		state = (state+1)%3
+		console.log('new state ' + state)
+		count = 0;
+	}
+
+	fakeData = [Math.floor(Math.random() * 500), 0, 1, 1, state]
+	eye1 = fakeData[0]
+	eye2 = fakeData[1]
+	pitch = fakeData[2]
+	roll = fakeData[3]
+	state = fakeData[4]
+	console.log("eye1 " + eye1);
+
+	processData(eye1, eye2);
+
+	sock.emit('pitch',pitch);
+	sock.emit('fakeData', fakeData);
+	sock.emit('roll',roll);
+	sock.emit('state', state);
+	count++;
+	//console.log('emitted pitch, fakeData, roll, state')
+}
 
 function sendData(data) {
+	console.log("data: " + data)
 	if (sock != null) {
 		eye1 = data.readUInt32LE(0);
 		eye2 = data.readUInt32LE(4);
 		pitch = data.readInt32LE(8);	
 		roll = data.readInt32LE(12);
 		state = data.readInt32LE(16);
-		console.log(eye1)
+		/*console.log(eye1)
 		console.log(eye2)
-		console.log("state: " + state)
+		console.log("state: " + state)*/
 		sock.emit('eyeMovMinCounter',minuteCounter);
-
+		/*
 		//update and emit state
 		checkMovements();
 		updateState();
@@ -228,7 +265,7 @@ function sendData(data) {
 			if (stream != null){
 				logData('state', state);
 			}
-		}
+		}*/
 
 		processData(eye1, eye2);
 		if (stream != null) {
@@ -255,10 +292,13 @@ var stop = function() {
 		noble.stopScanning();
 };
 
+
 noble.on('scanStart', function() {
 		console.log('Scan started');
 		//setTimeout(stop, 5000);
 });
+
+
 
 noble.on('scanStop', function() {
 		console.log('Scan stopped');
@@ -331,9 +371,10 @@ var onDeviceDiscoveredCallback = function(peripheral) {
 };
 
 noble.on('stateChange', function(state) {
+	console.log("stateChange");
 		if (state === 'poweredOn') {
 				noble.startScanning([rfduino.serviceUUID], false);
 		}
 });
 
-noble.on('discover', onDeviceDiscoveredCallback);
+//noble.on('discover', onDeviceDiscoveredCallback);

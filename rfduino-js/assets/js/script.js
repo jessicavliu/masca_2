@@ -19,7 +19,7 @@ socket.on('eyeMovMinCounter', function (data) {
 });
 
 socket.on('eyeMovCounter', function (data) {
-  console.log('boom');
+  //console.log('boom');
   $('#eye1-counter').text(data);
 });
 

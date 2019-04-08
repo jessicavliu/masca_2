@@ -44,7 +44,7 @@ body {
 
 .channel {
   width: 200px;
-  height: 200px;
+  height: 180px;
   text-align: center;
   background: rgba(0, 0, 0, .1);
 }

@@ -9,7 +9,7 @@ html(lang="en")
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
     script(src='/js/multithread.js')
     script(src='/js/d3.v4.min.js')
-    script(src='/js/script.js')
+    script(src='/js/script2.js')
  body
     #title openSleep
     img(src="img/zzz.svg" id="zzz")
@@ -37,8 +37,8 @@ html(lang="en")
       #channel-eye1.channel
         .channel-name Eye 1
         #eye1.channel-value 0
-        //#eye1-counter.channel-value 0
-        //#eye1-counter-per-min.channel-value 0
+        #eye1-counter.channel-value 0
+        #eye1-counter-per-min.channel-value 0
       #channel-eye2.channel
         .channel-name Eye 2
         #eye2.channel-value 0
@@ -48,5 +48,8 @@ html(lang="en")
       #channel-roll.channel
         .channel-name Roll
         #roll.channel-value 0
+      #channel-state.channel
+        .channel-name State
+        #state.channel-value 0
     svg(width="1200" height="500" id="plot") 
     svg(width="1200" height="200" id="plot-hist") 
